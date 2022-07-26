@@ -1,0 +1,62 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\ext83668\\Documents\\C#\\Ejercicios_Coder\\DesafioEntregable\\DesafioEntregable\\DesafioEntregable.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\ext83668\\Documents\\C#\\Ejercicios_Coder\\DesafioEntregable\\DesafioEntregable\\DesafioEntregable.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\ext83668\\Documents\\C#\\Ejercicios_Coder\\DesafioEntregable\\DesafioEntregable\\DesafioEntregable.csproj",
+        "projectName": "DesafioEntregable",
+        "projectPath": "C:\\Users\\ext83668\\Documents\\C#\\Ejercicios_Coder\\DesafioEntregable\\DesafioEntregable\\DesafioEntregable.csproj",
+        "packagesPath": "C:\\Users\\ext83668\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ext83668\\Documents\\C#\\Ejercicios_Coder\\DesafioEntregable\\DesafioEntregable\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\ext83668\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.301\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
