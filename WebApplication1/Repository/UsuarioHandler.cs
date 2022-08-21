@@ -4,9 +4,12 @@ using System.Data.SqlClient;
 namespace WebApplication1.Repository
 {
     public static class UsuarioHandler
-    {        
+    {
         public const string QRY_USUARIOS = "SELECT * FROM Usuario";
         public const string QRY_USUARIO_BY_USERNAME = "SELECT * FROM Usuario WHERE NombreUsuario = @user";
+        public const string QRY_DELETE_USUARIO_BY_ID = "DELETE FROM Usuario WHERE Id = @id";
+        public const string QRY_CREA_USUARIO = "INSERT INTO Usuario (Nombre, Apellido, NombreUsuario, Contraseña, Mail) VALUES (@param_nombre, @param_apellido, @param_nombreusuario, @param_clave, @param_mail)";
+        public const string QRY_MODIFICA_USUARIO = "UPDATE Usuario SET Nombre = @param_nombre, Apellido = @param_apellido, NombreUsuario = @param_nombreusuario, Contraseña = @param_clave, Mail = @param_mail WHERE Id = @param_id";
         public const string ConnectionString = "Server=G4X97D3;Database=SistemaGestion;Trusted_Connection=True";
 
         public static List<Usuario> GetUsuarios()
@@ -31,10 +34,9 @@ namespace WebApplication1.Repository
                                 user._nombre = Convert.ToString(reader["Nombre"]);
                                 user._apellido = Convert.ToString(reader["Apellido"]);
                                 user._nombreUsuario = Convert.ToString(reader["NombreUsuario"]);
-                                user._mail = Convert.ToString(reader["Mail"]);                          
+                                user._mail = Convert.ToString(reader["Mail"]);
 
                                 users.Add(user);
-                                user.mostrardatos();
                             }
                         }
                     }
@@ -88,7 +90,7 @@ namespace WebApplication1.Repository
                                 else
                                 {
                                     usuario_byusername = null;
-                                }                                
+                                }
                             }
                         }
                     }
@@ -97,5 +99,118 @@ namespace WebApplication1.Repository
             }
             return usuario_byusername;
         }
+
+        public static bool DeleteUsuario(int id)
+        {
+            bool resultado = false;
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                SqlParameter parametro = new SqlParameter();
+                parametro.ParameterName = "@id";
+                parametro.SqlDbType = SqlDbType.BigInt;
+                parametro.Value = id;
+
+                sqlConnection.Open();
+
+                using (SqlCommand cmd = new SqlCommand(QRY_DELETE_USUARIO_BY_ID, sqlConnection))
+                {
+                    cmd.Parameters.Add(parametro);
+                    int affectedrows = cmd.ExecuteNonQuery();
+                    if (affectedrows > 0)
+                    {
+                        resultado = true;
+                    }
+                }
+                sqlConnection.Close();
+            }
+            return resultado;
+        }
+
+        public static bool CrearUsuario(Usuario usuario)
+        {
+            bool resultado = false;
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                SqlParameter param_nombre = new SqlParameter("param_nombre", SqlDbType.VarChar) { Value = usuario._nombre };
+                SqlParameter param_apellido = new SqlParameter("param_apellido", SqlDbType.VarChar) { Value = usuario._apellido };
+                SqlParameter param_nombreusuario = new SqlParameter("param_nombreusuario", SqlDbType.VarChar) { Value = usuario._nombreUsuario };
+                SqlParameter param_clave = new SqlParameter("param_clave", SqlDbType.VarChar) { Value = usuario._contraseña };
+                SqlParameter param_mail = new SqlParameter("param_mail", SqlDbType.VarChar) { Value = usuario._mail };
+
+                sqlConnection.Open();
+                try
+                {
+                    using (SqlCommand cmd = new SqlCommand(QRY_CREA_USUARIO, sqlConnection))
+                    {
+                        cmd.Parameters.Add(param_nombre);
+                        cmd.Parameters.Add(param_apellido);
+                        cmd.Parameters.Add(param_nombreusuario);
+                        cmd.Parameters.Add(param_clave);
+                        cmd.Parameters.Add(param_mail);
+
+                        int affectedrows = cmd.ExecuteNonQuery();
+                        if (affectedrows > 0)
+                        {
+                            resultado = true;
+                        }
+                    }
+                    sqlConnection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERROR: " + ex.Message);
+                    resultado = false;
+                }
+            }
+            return resultado;
+        }
+
+        public static bool ModificaUsuario(Usuario usuario)
+        {
+            bool resultado = false;
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                SqlParameter param_nombre = new SqlParameter("param_nombre", SqlDbType.VarChar) { Value = usuario._nombre };
+                SqlParameter param_apellido = new SqlParameter("param_apellido", SqlDbType.VarChar) { Value = usuario._apellido };
+                SqlParameter param_nombreusuario = new SqlParameter("param_nombreusuario", SqlDbType.VarChar) { Value = usuario._nombreUsuario };
+                SqlParameter param_clave = new SqlParameter("param_clave", SqlDbType.VarChar) { Value = usuario._contraseña };
+                SqlParameter param_mail = new SqlParameter("param_mail", SqlDbType.VarChar) { Value = usuario._mail };
+                SqlParameter param_id = new SqlParameter("param_id", SqlDbType.BigInt) { Value = usuario.Id };
+
+                sqlConnection.Open();
+
+                using (SqlCommand cmd = new SqlCommand(QRY_MODIFICA_USUARIO, sqlConnection))
+                {
+                    cmd.Parameters.Add(param_nombre);
+                    cmd.Parameters.Add(param_id);
+                    cmd.Parameters.Add(param_apellido);
+                    cmd.Parameters.Add(param_nombreusuario);
+                    cmd.Parameters.Add(param_clave);
+                    cmd.Parameters.Add(param_mail);
+                    try
+                    {
+                        int affectedrows = cmd.ExecuteNonQuery();
+                        if (affectedrows > 0)
+                        {
+                            Console.WriteLine("Modificación de usuario exitosa.");
+                            resultado = true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Usuario inválido.");
+                            resultado = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("ERROR: " + ex.Message);
+                        resultado = false;
+                    }
+                }
+                sqlConnection.Close();
+            }
+            return resultado;
+        }
     }
 }
+

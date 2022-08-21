@@ -12,14 +12,5 @@ namespace WebApplication1
         public int Stock { get; set; }
         public int IdProducto { get; set; }
         public int IdVenta { get; set; }
-
-
-        public void mostrardatos()
-        {
-            Console.WriteLine("Producto vendido ID: " + Id.ToString());           
-            Console.WriteLine("Id de Producto: " + IdProducto.ToString());            
-            Console.WriteLine("Stock de Producto vendido: " + Stock.ToString());
-            Console.WriteLine("ID de venta: " + IdVenta.ToString());
-        }
     }
 }
