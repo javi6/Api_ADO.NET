@@ -15,19 +15,18 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost]
-        public bool CargarVenta([FromBody] List<PostVentaProducto> listaProductos, int id)
+        public bool CargarVenta([FromBody] List<PostVentaProducto> listaProductos, int idVendedor)
         {            
             List<ProductoVendido> ListaVenta = new List<ProductoVendido>();
             foreach (PostVentaProducto prod_from_web in listaProductos)
             {
                 ListaVenta.Add(new ProductoVendido
                 {                             
-                    IdProducto = prod_from_web.IdProducto,
-                    IdVenta = prod_from_web.IdVenta,
+                    IdProducto = prod_from_web.IdProducto,                    
                     Stock = prod_from_web.Stock                    
                 });
             }
-            return VentaHandler.CargarVenta(ListaVenta, id);
+            return VentaHandler.CargarVenta(ListaVenta, idVendedor);
         }
     }
 }

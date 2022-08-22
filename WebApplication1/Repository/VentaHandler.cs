@@ -6,7 +6,8 @@ namespace WebApplication1.Repository
     public static class VentaHandler
     {
         public const string QRY_VENTA = "SELECT * FROM Venta";
-        public const string QRY_CARGA_VENTA = "INSERT INTO Venta (Comentarios) VALUES (@param_comentarios)";        
+        public const string QRY_CARGA_VENTA = "INSERT INTO Venta (Comentarios) VALUES (@param_comentarios)";
+        public const string QRY_GET_ID_ULTIMA_VENTA = "SELECT * FROM Venta WHERE id=(SELECT max(id) FROM Venta)";
         public const string ConnectionString = "Server=G4X97D3;Database=SistemaGestion;Trusted_Connection=True";
 
         public static List<Venta> GetVentas()
@@ -44,41 +45,70 @@ namespace WebApplication1.Repository
         {
             bool resultado = false;
 
-            // Validamos si en la lista de productos vendidos al menos alguno de ellos es correcto como para 
-            // registrar una venta exitosa.
-            if(ProductosVendidosHandler.cargarProductosVendidos(productos, idUsuarioVendedor))
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
             {
-                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                int idVenta = 0;
+                SqlParameter param_comentarios = new SqlParameter("param_comentarios", SqlDbType.VarChar) { Value = "Nueva venta de usuario: " + idUsuarioVendedor };
+
+                sqlConnection.Open();
+                try
                 {
-                    SqlParameter param_comentarios = new SqlParameter("param_comentarios", SqlDbType.VarChar) { Value = "Nueva venta de usuario: " + idUsuarioVendedor };
-
-                    sqlConnection.Open();
-                    try
+                    using (SqlCommand cmd = new SqlCommand(QRY_CARGA_VENTA, sqlConnection))
                     {
-                        using (SqlCommand cmd = new SqlCommand(QRY_CARGA_VENTA, sqlConnection))
-                        {
-                            cmd.Parameters.Add(param_comentarios);
+                        cmd.Parameters.Add(param_comentarios);
 
-                            int affectedrows = cmd.ExecuteNonQuery();
-                            if (affectedrows > 0)
-                            {
+                        int affectedrows = cmd.ExecuteNonQuery();
+                        
+                        if (affectedrows > 0)
+                        {
+                            idVenta = GetIdVenta();     // Obtenemos Id de la venta.
+
+                            if(idVenta != -1)
+                            {   
+                                // Carga los productos vendidos.
+                                ProductosVendidosHandler.cargarProductosVendidos(productos, idVenta);
                                 resultado = true;
                             }
+                            else
+                            {
+                                resultado = false;
+                            }
+                            
                         }
-                        sqlConnection.Close();
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("ERROR: " + ex.Message);
-                        resultado = false;
-                    }
-                }            
-            }
-            else
-            {
-                resultado = false;
+                    sqlConnection.Close();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERROR: " + ex.Message);
+                    resultado = false;
+                }
             }            
             return resultado;
+        }
+
+        public static int GetIdVenta()
+        {
+            int idVenta = -1; 
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {                
+                //Consulta Id de la última venta realizada.
+                using (SqlCommand cmd = new SqlCommand(QRY_GET_ID_ULTIMA_VENTA, sqlConnection))
+                {
+                    sqlConnection.Open();
+   
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            reader.Read();
+                            idVenta = Convert.ToInt32(reader["Id"]);   
+                        }                                                
+                    }
+                    sqlConnection.Close();
+                }
+            }
+            return idVenta;
         }
     }
 }

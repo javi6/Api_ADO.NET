@@ -8,7 +8,7 @@ namespace WebApplication1.Repository
         public const string QRY_PRODUCTOS = "SELECT * FROM Producto";
         public const string QRY_USUARIOS_ID = "SELECT Id FROM Usuario";
         public const string QRY_PRODUCTOS_ID = "SELECT Id FROM Producto";
-        public const string QRY_DELETE_PRODUCTOVENDIDO_Y_PRODUCTO_BY_ID = "DELETE FROM ProductoVendido WHERE Id = @id DELETE FROM Producto WHERE Id = @id";
+        public const string QRY_DELETE_PRODUCTOVENDIDO_Y_PRODUCTO_BY_ID = "DELETE FROM ProductoVendido WHERE IdProducto = @idProducto DELETE FROM Producto WHERE Id = @idProducto";
         public const string QRY_CREA_PRODUCTO = "INSERT INTO Producto (Descripciones, Costo, PrecioVenta, Stock, IdUsuario) VALUES (@param_desc, @param_costo, @param_precio_venta, @param_stock, @param_idusuario)";
         public const string QRY_MODIFICA_PRODUCTOO = "UPDATE Producto SET Descripciones = @param_desc, Costo = @param_costo, PrecioVenta = @param_precio_venta, Stock =@param_stock, IdUsuario = @param_idusuario WHERE Id = @param_id";        
         public const string ConnectionString = "Server=G4X97D3;Database=SistemaGestion;Trusted_Connection=True";
@@ -49,16 +49,16 @@ namespace WebApplication1.Repository
             return products;
         }
 
-        public static bool DeleteProducto(int id)
+        public static bool DeleteProducto(int idProducto)
         {
             bool resultado = false;
             int affectedrows = 0;
             using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
             {
                 SqlParameter parametro = new SqlParameter();
-                parametro.ParameterName = "@id";
+                parametro.ParameterName = "@idProducto";
                 parametro.SqlDbType = SqlDbType.BigInt;
-                parametro.Value = id;
+                parametro.Value = idProducto;
 
                 sqlConnection.Open();
 
@@ -68,7 +68,7 @@ namespace WebApplication1.Repository
                     affectedrows = cmd.ExecuteNonQuery();
                     if (affectedrows > 0)
                     {
-                        Console.WriteLine("Producto con ID: {0} modificado.", id);
+                        Console.WriteLine("Producto con ID: {0} modificado.", idProducto);
                         resultado = true;
                     }
                 }
@@ -79,51 +79,42 @@ namespace WebApplication1.Repository
 
         public static bool CreaProducto(Producto producto)
         {
-            bool resultado = false;
-            List<int> usuarios_id_list = obtenerListaId(QRY_USUARIOS_ID);    // Obtiene una lista de los Id de usuarios existentes en la base de datos.
+            bool resultado = false;          
 
             if (validaProducto(producto))                // Valida los parámetros pasados a producto antes de hacer la conexión.
             {
-                if (usuarios_id_list.Contains(producto.IdUsuario))   // Valida que el id de usuario ingresado exista.
+                using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
                 {
-                    using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+                    SqlParameter param_desc = new SqlParameter("param_desc", SqlDbType.VarChar) { Value = producto.Descripcion };
+                    SqlParameter param_costo = new SqlParameter("param_costo", SqlDbType.Money) { Value = producto.Costo };
+                    SqlParameter param_precio_venta = new SqlParameter("param_precio_venta", SqlDbType.Money) { Value = producto.PrecioVenta };
+                    SqlParameter param_stock = new SqlParameter("param_stock", SqlDbType.Int) { Value = producto.Stock };
+                    SqlParameter param_idusuario = new SqlParameter("param_idusuario", SqlDbType.BigInt) { Value = producto.IdUsuario };
+                    sqlConnection.Open();
+                    try
                     {
-                        SqlParameter param_desc = new SqlParameter("param_desc", SqlDbType.VarChar) { Value = producto.Descripcion };
-                        SqlParameter param_costo = new SqlParameter("param_costo", SqlDbType.Money) { Value = producto.Costo };
-                        SqlParameter param_precio_venta = new SqlParameter("param_precio_venta", SqlDbType.Money) { Value = producto.PrecioVenta };
-                        SqlParameter param_stock = new SqlParameter("param_stock", SqlDbType.Int) { Value = producto.Stock };
-                        SqlParameter param_idusuario = new SqlParameter("param_idusuario", SqlDbType.BigInt) { Value = producto.IdUsuario };
-                        sqlConnection.Open();
-                        try
+                        using (SqlCommand cmd = new SqlCommand(QRY_CREA_PRODUCTO, sqlConnection))
                         {
-                            using (SqlCommand cmd = new SqlCommand(QRY_CREA_PRODUCTO, sqlConnection))
-                            {
-                                cmd.Parameters.Add(param_desc);
-                                cmd.Parameters.Add(param_costo);
-                                cmd.Parameters.Add(param_precio_venta);
-                                cmd.Parameters.Add(param_stock);
-                                cmd.Parameters.Add(param_idusuario);
+                            cmd.Parameters.Add(param_desc);
+                            cmd.Parameters.Add(param_costo);
+                            cmd.Parameters.Add(param_precio_venta);
+                            cmd.Parameters.Add(param_stock);
+                            cmd.Parameters.Add(param_idusuario);
 
-                                int affectedrows = cmd.ExecuteNonQuery();
-                                if (affectedrows > 0)
-                                {
-                                    resultado = true;
-                                }
+                            int affectedrows = cmd.ExecuteNonQuery();
+                            if (affectedrows > 0)
+                            {
+                                resultado = true;
                             }
-                            sqlConnection.Close();
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("ERROR: " + ex.Message);
-                            resultado = false;
-                        }
-                    }                    
-                }
-                else
-                {
-                    Console.WriteLine("Usuario inexistente.");
-                    resultado = false;
-                }
+                        sqlConnection.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("ERROR: " + ex.Message);
+                        resultado = false;
+                    }
+                }                    
             }
             else
             {

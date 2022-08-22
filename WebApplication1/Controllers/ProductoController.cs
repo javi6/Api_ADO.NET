@@ -15,11 +15,11 @@ namespace WebApplication1.Controllers
         }
 
         [HttpDelete(Name = "Borra PRODUCTO")]
-        public bool DeleteProducto([FromBody] int id)
+        public bool DeleteProducto([FromBody] int idProducto)
         {
             try
             {
-                return ProductoHandler.DeleteProducto(id);
+                return ProductoHandler.DeleteProducto(idProducto);
             }
             catch (Exception ex)
             {

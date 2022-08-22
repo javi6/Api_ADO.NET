@@ -31,10 +31,10 @@ namespace WebApplication1.Repository
                             {
                                 Usuario user = new Usuario();
                                 user.Id = Convert.ToInt32(reader["Id"]);
-                                user._nombre = Convert.ToString(reader["Nombre"]);
-                                user._apellido = Convert.ToString(reader["Apellido"]);
-                                user._nombreUsuario = Convert.ToString(reader["NombreUsuario"]);
-                                user._mail = Convert.ToString(reader["Mail"]);
+                                user.Nombre = Convert.ToString(reader["Nombre"]);
+                                user.Apellido = Convert.ToString(reader["Apellido"]);
+                                user.NombreUsuario = Convert.ToString(reader["NombreUsuario"]);
+                                user.Mail = Convert.ToString(reader["Mail"]);
 
                                 users.Add(user);
                             }
@@ -81,10 +81,10 @@ namespace WebApplication1.Repository
                                 if (usuario_byusername.checkPassword(userpass_from_login))
                                 {
                                     usuario_byusername.Id = Convert.ToInt32(reader["Id"]);
-                                    usuario_byusername._nombre = Convert.ToString(reader["Nombre"]);
-                                    usuario_byusername._apellido = Convert.ToString(reader["Apellido"]);
-                                    usuario_byusername._nombreUsuario = Convert.ToString(reader["NombreUsuario"]);
-                                    usuario_byusername._mail = Convert.ToString(reader["Mail"]);
+                                    usuario_byusername.Nombre = Convert.ToString(reader["Nombre"]);
+                                    usuario_byusername.Apellido = Convert.ToString(reader["Apellido"]);
+                                    usuario_byusername.NombreUsuario = Convert.ToString(reader["NombreUsuario"]);
+                                    usuario_byusername.Mail = Convert.ToString(reader["Mail"]);
                                 }
                                 // Silas claves no coinciden devuelvo objeto nulo para no exponer datos.
                                 else
@@ -131,11 +131,11 @@ namespace WebApplication1.Repository
             bool resultado = false;
             using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
             {
-                SqlParameter param_nombre = new SqlParameter("param_nombre", SqlDbType.VarChar) { Value = usuario._nombre };
-                SqlParameter param_apellido = new SqlParameter("param_apellido", SqlDbType.VarChar) { Value = usuario._apellido };
-                SqlParameter param_nombreusuario = new SqlParameter("param_nombreusuario", SqlDbType.VarChar) { Value = usuario._nombreUsuario };
-                SqlParameter param_clave = new SqlParameter("param_clave", SqlDbType.VarChar) { Value = usuario._contraseña };
-                SqlParameter param_mail = new SqlParameter("param_mail", SqlDbType.VarChar) { Value = usuario._mail };
+                SqlParameter param_nombre = new SqlParameter("param_nombre", SqlDbType.VarChar) { Value = usuario.Nombre };
+                SqlParameter param_apellido = new SqlParameter("param_apellido", SqlDbType.VarChar) { Value = usuario.Apellido };
+                SqlParameter param_nombreusuario = new SqlParameter("param_nombreusuario", SqlDbType.VarChar) { Value = usuario.NombreUsuario };
+                SqlParameter param_clave = new SqlParameter("param_clave", SqlDbType.VarChar) { Value = usuario.Contraseña };
+                SqlParameter param_mail = new SqlParameter("param_mail", SqlDbType.VarChar) { Value = usuario.Mail };
 
                 sqlConnection.Open();
                 try
@@ -170,11 +170,11 @@ namespace WebApplication1.Repository
             bool resultado = false;
             using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
             {
-                SqlParameter param_nombre = new SqlParameter("param_nombre", SqlDbType.VarChar) { Value = usuario._nombre };
-                SqlParameter param_apellido = new SqlParameter("param_apellido", SqlDbType.VarChar) { Value = usuario._apellido };
-                SqlParameter param_nombreusuario = new SqlParameter("param_nombreusuario", SqlDbType.VarChar) { Value = usuario._nombreUsuario };
-                SqlParameter param_clave = new SqlParameter("param_clave", SqlDbType.VarChar) { Value = usuario._contraseña };
-                SqlParameter param_mail = new SqlParameter("param_mail", SqlDbType.VarChar) { Value = usuario._mail };
+                SqlParameter param_nombre = new SqlParameter("param_nombre", SqlDbType.VarChar) { Value = usuario.Nombre };
+                SqlParameter param_apellido = new SqlParameter("param_apellido", SqlDbType.VarChar) { Value = usuario.Apellido };
+                SqlParameter param_nombreusuario = new SqlParameter("param_nombreusuario", SqlDbType.VarChar) { Value = usuario.NombreUsuario };
+                SqlParameter param_clave = new SqlParameter("param_clave", SqlDbType.VarChar) { Value = usuario.Contraseña };
+                SqlParameter param_mail = new SqlParameter("param_mail", SqlDbType.VarChar) { Value = usuario.Mail };
                 SqlParameter param_id = new SqlParameter("param_id", SqlDbType.BigInt) { Value = usuario.Id };
 
                 sqlConnection.Open();

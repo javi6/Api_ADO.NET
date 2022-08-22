@@ -5,16 +5,16 @@ namespace WebApplication1
     public class Usuario
     {
         public int Id { get; set; }
-        public string? _nombre { get; set; }
-        public string? _apellido { get; set; }
-        public string? _nombreUsuario { get; set; }
-        public string? _mail { get; set; }
-        public string _contraseña { get; set; } = "Admin"; // Clave por defecto.
+        public string? Nombre { get; set; }
+        public string? Apellido { get; set; }
+        public string? NombreUsuario { get; set; }
+        public string? Mail { get; set; }
+        public string Contraseña { get; set; } = "Admin"; // Clave por defecto.
 
         // Compara la clave 
         public bool checkPassword(string clave)
         {
-            if (clave.Equals(_contraseña))   // Si las claves coinciden devuelve true.
+            if (clave.Equals(Contraseña))   // Si las claves coinciden devuelve true.
                 return true;
             else
                 return false;
@@ -25,7 +25,7 @@ namespace WebApplication1
         // longitudes de clave, cantidad de intentos erróneos, etc.
         public void set_clave(string clave)
         {
-            _contraseña = clave;
+            Contraseña = clave;
         }
 
 

@@ -35,11 +35,11 @@ namespace WebApplication1.Controllers
             return UsuarioHandler.ModificaUsuario(new Usuario
             {
                 Id = usuario.Id,
-                _apellido = usuario.Apellido,
-                _mail = usuario.Mail,
-                _nombreUsuario = usuario.NombreUsuario,
-                _contraseña = usuario.Contraseña,
-                _nombre = usuario.Nombre
+                Apellido = usuario.Apellido,
+                Mail = usuario.Mail,
+                NombreUsuario = usuario.NombreUsuario,
+                Contraseña = usuario.Contraseña,
+                Nombre = usuario.Nombre
             });
         }
 
@@ -50,11 +50,11 @@ namespace WebApplication1.Controllers
             {
                 return UsuarioHandler.CrearUsuario(new Usuario
                 {
-                    _nombre = usuario.Nombre,
-                    _apellido = usuario.Apellido,
-                    _mail = usuario.Mail,
-                    _nombreUsuario = usuario.NombreUsuario,
-                    _contraseña = usuario.Contraseña
+                    Nombre = usuario.Nombre,
+                    Apellido = usuario.Apellido,
+                    Mail = usuario.Mail,
+                    NombreUsuario = usuario.NombreUsuario,
+                    Contraseña = usuario.Contraseña
                 });
             }
             catch (Exception ex)

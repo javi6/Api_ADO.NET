@@ -43,7 +43,8 @@ namespace WebApplication1.Repository
             return prodVendidos;
         }
 
-        public static bool cargarProductosVendidos(List<ProductoVendido> productos, int idUsuarioVendedor)
+        // Toma la lista de productos y el Id de la venta.
+        public static bool cargarProductosVendidos(List<ProductoVendido> productos, int idVenta)
         {
             bool resultado = false;
             using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
@@ -54,7 +55,7 @@ namespace WebApplication1.Repository
                     {
                         SqlParameter param_stock = new SqlParameter("param_stock", SqlDbType.BigInt) { Value = productovendido.Stock };
                         SqlParameter param_idproducto = new SqlParameter("param_idproducto", SqlDbType.BigInt) { Value = productovendido.IdProducto };
-                        SqlParameter param_idventa = new SqlParameter("param_idventa", SqlDbType.BigInt) { Value = productovendido.IdVenta };
+                        SqlParameter param_idventa = new SqlParameter("param_idventa", SqlDbType.BigInt) { Value = idVenta };
 
                         sqlConnection.Open();
                         try
