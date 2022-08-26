@@ -8,9 +8,11 @@ namespace WebApplication1.Repository
         public const string QRY_PRODUCTOS = "SELECT * FROM Producto";
         public const string QRY_USUARIOS_ID = "SELECT Id FROM Usuario";
         public const string QRY_PRODUCTOS_ID = "SELECT Id FROM Producto";
-        public const string QRY_DELETE_PRODUCTOVENDIDO_Y_PRODUCTO_BY_ID = "DELETE FROM ProductoVendido WHERE IdProducto = @idProducto DELETE FROM Producto WHERE Id = @idProducto";
+        public const string QRY_STOCK_PRODUCTOS_ID = "SELECT STOCK FROM Producto WHERE Id = @param_id";
+        public const string QRY_DELETE_PRODUCTO_VENDIDO_Y_PRODUCTO_BY_ID = "DELETE FROM ProductoVendido WHERE IdProducto = @idProducto DELETE FROM Producto WHERE Id = @idProducto";
         public const string QRY_CREA_PRODUCTO = "INSERT INTO Producto (Descripciones, Costo, PrecioVenta, Stock, IdUsuario) VALUES (@param_desc, @param_costo, @param_precio_venta, @param_stock, @param_idusuario)";
-        public const string QRY_MODIFICA_PRODUCTOO = "UPDATE Producto SET Descripciones = @param_desc, Costo = @param_costo, PrecioVenta = @param_precio_venta, Stock =@param_stock, IdUsuario = @param_idusuario WHERE Id = @param_id";        
+        public const string QRY_MODIFICA_PRODUCTO = "UPDATE Producto SET Descripciones = @param_desc, Costo = @param_costo, PrecioVenta = @param_precio_venta, Stock =@param_stock, IdUsuario = @param_idusuario WHERE Id = @param_id";
+        public const string QRY_REINTEGRA_PRODUCTO = "UPDATE Producto SET Stock = @param_stock WHERE Id = @param_id";
         public const string ConnectionString = "Server=G4X97D3;Database=SistemaGestion;Trusted_Connection=True";
 
         public static List<Producto> GetProductos()
@@ -62,7 +64,7 @@ namespace WebApplication1.Repository
 
                 sqlConnection.Open();
 
-                using (SqlCommand cmd = new SqlCommand(QRY_DELETE_PRODUCTOVENDIDO_Y_PRODUCTO_BY_ID, sqlConnection))
+                using (SqlCommand cmd = new SqlCommand(QRY_DELETE_PRODUCTO_VENDIDO_Y_PRODUCTO_BY_ID, sqlConnection))
                 {
                     cmd.Parameters.Add(parametro);
                     affectedrows = cmd.ExecuteNonQuery();
@@ -146,7 +148,7 @@ namespace WebApplication1.Repository
 
                             sqlConnection.Open();
 
-                            using (SqlCommand cmd = new SqlCommand(QRY_MODIFICA_PRODUCTOO, sqlConnection))
+                            using (SqlCommand cmd = new SqlCommand(QRY_MODIFICA_PRODUCTO, sqlConnection))
                             {
                                 cmd.Parameters.Add(param_id);
                                 cmd.Parameters.Add(param_desc);
@@ -189,6 +191,38 @@ namespace WebApplication1.Repository
             }
 
             return resultado;
+        }
+
+        // Sobrecarga del método para actualizar el stock del producto de la venta eliminada.
+        public static bool ModificaProducto(ProductoVendido productovendido)
+        {
+            bool resultado = false;
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                SqlParameter param_stock = new SqlParameter("param_stock", SqlDbType.Int) { Value = productovendido.Stock };
+                SqlParameter param_id = new SqlParameter("param_id", SqlDbType.BigInt) { Value = productovendido.IdProducto };
+
+                sqlConnection.Open();
+
+                using (SqlCommand cmd = new SqlCommand(QRY_REINTEGRA_PRODUCTO, sqlConnection))
+                {
+                    cmd.Parameters.Add(param_id);
+                    cmd.Parameters.Add(param_stock);
+
+                    int affectedrows = cmd.ExecuteNonQuery();
+                    if (affectedrows > 0)
+                    {
+                        resultado = true;
+                    }
+                    else
+                    {
+                        resultado = false;
+                    }
+                }
+                sqlConnection.Close();
+
+                return resultado;
+            }
         }
 
         public static List<int> obtenerListaId(string qry)
@@ -240,6 +274,46 @@ namespace WebApplication1.Repository
             }
 
             return resultado;
+        }
+
+        public static bool reintegraProductos(List<ProductoVendido> productos)
+        {
+            foreach(ProductoVendido prodvendido in productos)
+            {
+                prodvendido.Stock = prodvendido.Stock + getStock(prodvendido);      // Guardo el stock a actualizar de cada producto vendido a reintegrar.
+                ModificaProducto(prodvendido);
+            }
+            return false;
+        }
+
+        public static int getStock(ProductoVendido productovendido)
+        {
+            int stock = 0;
+
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                SqlParameter param_id = new SqlParameter("param_id", SqlDbType.BigInt) { Value = productovendido.IdProducto };
+
+                //Consulta stock por id de producto.
+                using (SqlCommand cmd = new SqlCommand(QRY_STOCK_PRODUCTOS_ID, sqlConnection))
+                {
+                    sqlConnection.Open();
+                    cmd.Parameters.Add(param_id);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                stock = Convert.ToInt32(reader["Stock"]);
+                            }
+                        }
+                        sqlConnection.Close();
+                    }
+                }
+            }
+            return stock;
         }
 
     }

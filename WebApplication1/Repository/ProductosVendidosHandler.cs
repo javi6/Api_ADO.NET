@@ -9,6 +9,8 @@ namespace WebApplication1.Repository
         public const string QRY_CARGA_PRODUCTO_VENDIDO = "INSERT INTO ProductoVendido (Stock, IdProducto, IdVenta) VALUES (@param_stock, @param_idproducto, @param_idventa)";
         public const string QRY_PRODUCTOS_ID = "SELECT Stock FROM Producto WHERE Id = @param_id";
         public const string QRY_MODIFICA_STOCK_PRODUCTO = "UPDATE Producto SET Stock = @param_stock WHERE Id = @param_id";
+        public const string QRY_PRODUCTOS_VENDIDOS_ID_VENTA = "SELECT * FROM ProductoVendido WHERE IdVenta = @param_idVenta";
+        public const string QRY_DELETE_PRODUCTOS_VENDIDOS_ID_VENTA = "DELETE FROM ProductoVendido WHERE IdVenta = @idVenta";
         public const string ConnectionString = "Server=G4X97D3;Database=SistemaGestion;Trusted_Connection=True";
 
         public static List<ProductoVendido> GetProductosVendidos()
@@ -87,6 +89,77 @@ namespace WebApplication1.Repository
                 }
                 return resultado;
             }
+        }
+
+        public static bool eliminaProductosVendidos(int idVenta)
+        {
+            bool resultado = false;
+            List<ProductoVendido> ProductosVenta = new List<ProductoVendido>();
+
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                //Consulta la venta por IdVenta.
+                using (SqlCommand cmd = new SqlCommand(QRY_PRODUCTOS_VENDIDOS_ID_VENTA, sqlConnection))
+                {
+                    sqlConnection.Open();
+                    SqlParameter param_idVenta = new SqlParameter("param_idVenta", SqlDbType.BigInt) { Value = idVenta };
+                    cmd.Parameters.Add(param_idVenta);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            while (reader.Read())
+                            {
+                                ProductoVendido vendidosEliminar = new ProductoVendido();
+                                vendidosEliminar.IdProducto = Convert.ToInt32(reader["IdProducto"]);
+                                vendidosEliminar.Stock = Convert.ToInt32(reader["Stock"]);
+                                ProductosVenta.Add(vendidosEliminar);
+                            }
+                            ProductoHandler.reintegraProductos(ProductosVenta); // Paso el listado de id de producto junto con el stock de cada uno para reintegrarlos al stock.
+                            borraProductoVendido(idVenta);
+                            resultado = true;
+                        }
+                        else
+                        {
+                            resultado = false;
+                        }
+                    }
+                    sqlConnection.Close();
+                }
+
+               
+                return resultado;
+            }
+        }
+
+        public static bool borraProductoVendido(int idVenta)
+        {
+            bool resultado = false;
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(QRY_DELETE_PRODUCTOS_VENDIDOS_ID_VENTA, sqlConnection))
+                {
+                    sqlConnection.Open();
+                    SqlParameter param_id = new SqlParameter("idVenta", SqlDbType.BigInt) { Value = idVenta };
+                    cmd.Parameters.Add(param_id);
+
+                    int affectedrows = cmd.ExecuteNonQuery();
+                    if (affectedrows > 0)
+                    {
+                        Console.WriteLine("Se elimina Producto Vendido con ID de Venta: {0}.", idVenta);
+                        resultado = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Stock sin cambios");
+                        resultado = false;
+                    }                     
+
+                    sqlConnection.Close();
+                }
+            }
+            return resultado;
         }
 
         public static bool validarId_Stock(ProductoVendido productovendido)

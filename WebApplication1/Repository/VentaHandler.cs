@@ -8,6 +8,7 @@ namespace WebApplication1.Repository
         public const string QRY_VENTA = "SELECT * FROM Venta";
         public const string QRY_CARGA_VENTA = "INSERT INTO Venta (Comentarios) VALUES (@param_comentarios)";
         public const string QRY_GET_ID_ULTIMA_VENTA = "SELECT * FROM Venta WHERE id=(SELECT max(id) FROM Venta)";
+        public const string QRY_DELETE_VENTA = "DELETE FROM Venta WHERE Id = @idVenta";
         public const string ConnectionString = "Server=G4X97D3;Database=SistemaGestion;Trusted_Connection=True";
 
         public static List<Venta> GetVentas()
@@ -109,6 +110,35 @@ namespace WebApplication1.Repository
                 }
             }
             return idVenta;
+        }
+
+        public static bool DeleteVenta(int idVenta)
+        {
+            bool resultado = false;
+            int affectedrows = 0;
+            using (SqlConnection sqlConnection = new SqlConnection(ConnectionString))
+            {
+                SqlParameter parametro = new SqlParameter();
+                parametro.ParameterName = "@idVenta";
+                parametro.SqlDbType = SqlDbType.BigInt;
+                parametro.Value = idVenta;
+
+                sqlConnection.Open();
+
+                using (SqlCommand cmd = new SqlCommand(QRY_DELETE_VENTA, sqlConnection))
+                {
+                    cmd.Parameters.Add(parametro);
+                    affectedrows = cmd.ExecuteNonQuery();
+                    if (affectedrows > 0)
+                    {
+                        Console.WriteLine("Venta con ID: {0} modificado.", idVenta);
+                        resultado = true;
+                    }
+                }
+                sqlConnection.Close();
+            }
+            return resultado;
+
         }
     }
 }

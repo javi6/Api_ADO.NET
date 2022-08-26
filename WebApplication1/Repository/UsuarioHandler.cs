@@ -90,6 +90,7 @@ namespace WebApplication1.Repository
                                 else
                                 {
                                     usuario_byusername = null;
+                                    usuario_byusername.Contraseña = null;
                                 }
                             }
                         }
@@ -211,6 +212,7 @@ namespace WebApplication1.Repository
             }
             return resultado;
         }
+
     }
 }
 

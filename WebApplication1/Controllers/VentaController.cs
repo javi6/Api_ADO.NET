@@ -28,5 +28,13 @@ namespace WebApplication1.Controllers
             }
             return VentaHandler.CargarVenta(ListaVenta, idVendedor);
         }
+
+        [HttpDelete(Name = "Borra Venta")]
+        public bool DeleteVenta([FromBody] int idVenta)
+        {
+            ProductosVendidosHandler.eliminaProductosVendidos(idVenta);
+            return VentaHandler.DeleteVenta(idVenta);
+
+        }
     }
 }
